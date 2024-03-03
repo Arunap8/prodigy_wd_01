@@ -1,77 +1,50 @@
-let hr = 0;
-let min = 0;
-let sec = 0;
-let count = 0;
-let timer = false;
+var toggle_btn;
+var big_wrapper;
+var hamburger_menu;
 
-function $id(id) {
-    return document.getElementById(id);
+function declare() {
+  toggle_btn = document.querySelector(".toggle-btn");
+  big_wrapper = document.querySelector(".big-wrapper");
+  hamburger_menu = document.querySelector(".hamburger-menu");
 }
 
-function start() {
-    timer = true;
-    stopwatch();
+const main = document.querySelector("main");
+
+declare();
+
+let dark = false;
+
+function toggleAnimation() {
+  // Clone the wrapper
+  dark = !dark;
+  let clone = big_wrapper.cloneNode(true);
+  if (dark) {
+    clone.classList.remove("light");
+    clone.classList.add("dark");
+  } else {
+    clone.classList.remove("dark");
+    clone.classList.add("light");
+  }
+  clone.classList.add("copy");
+  main.appendChild(clone);
+
+  document.body.classList.add("stop-scrolling");
+
+  clone.addEventListener("animationend", () => {
+    document.body.classList.remove("stop-scrolling");
+    big_wrapper.remove();
+    clone.classList.remove("copy");
+    // Reset Variables
+    declare();
+    events();
+  });
 }
 
-function stop() {
-    timer = false;
-
+function events() {
+  toggle_btn.addEventListener("click", toggleAnimation);
+  hamburger_menu.addEventListener("click", () => {
+    big_wrapper.classList.toggle("active");
+  });
 }
 
-function reset() {
-    timer = false;
-    hr = min = sec = count = 0;
-
-    $id("hr").innerHTML = "00";
-    $id("min").innerHTML = "00";
-    $id("sec").innerHTML = "00";
-    $id("count").innerHTML = "00";
-
-}
-
-function stopwatch() {
-    if (timer) {
-        count += 1;
-    }
-
-    if (count === 99) {
-        sec += 1;
-        count = 0;
-    }
-    if (sec === 59) {
-        min += 1;
-        sec = 0;
-    }
-    if (min === 59) {
-        hr += 1;
-        min = 0;
-        sec = 0;
-    }
-
-    updateDisplay(hr, "hr");
-    updateDisplay(min, "min");
-    updateDisplay(sec, "sec");
-    updateDisplay(count, "count");
-
-    setTimeout(stopwatch, 10);
-}
-
-function updateDisplay(value, elementId) {
-    const stringValue = value < 10 ? '0' + value : value.toString();
-    document.getElementById(elementId).innerHTML = stringValue;
-}
-
-function lap() {
-    console.log(hr, min, sec, count)
-    const laps = $id('laps');
-    laps.innerHTML += "<li>" + hr + ":" + min + ":" + sec + ":" + count + "</li>";
-}
-
-function clearLap() {
-    $id('laps').remove();
-}
-
-function getLocalTime(){
-    const d = new Date().toLocaleTimeString();
-    console.log(d);
-}
+events();
